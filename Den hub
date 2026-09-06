@@ -1,0 +1,326 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local localPlayer = Players.LocalPlayer
+local PROJECT_DEN_OWNER_USER_ID = 8271158353
+
+-- ===== Palette =====
+local COLORS = {
+	Background = Color3.fromRGB(15, 30, 95),
+	TitleBar = Color3.fromRGB(64, 156, 235),
+	Accent = Color3.fromRGB(30, 120, 220),
+	AccentDim = Color3.fromRGB(15, 90, 180),
+	Text = Color3.fromRGB(255, 255, 255),
+	BodyText = Color3.fromRGB(230, 235, 245),
+	SubText = Color3.fromRGB(160, 175, 210),
+	Stroke = Color3.fromRGB(45, 65, 130),
+	Warning = Color3.fromRGB(235, 90, 90),
+	WarningBg = Color3.fromRGB(45, 25, 35),
+}
+
+-- ===== ScreenGui =====
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ProjectDenGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = localPlayer:WaitForChild("PlayerGui")
+
+-- ===== Main Frame =====
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 620, 0, 460)
+mainFrame.Position = UDim2.new(0.5, -310, 0.5, -230)
+mainFrame.BackgroundColor3 = COLORS.Background
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 14)
+mainCorner.Parent = mainFrame
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Color = COLORS.Stroke
+mainStroke.Thickness = 1
+mainStroke.Parent = mainFrame
+
+-- subtle drop shadow
+local shadow = Instance.new("ImageLabel")
+shadow.Name = "Shadow"
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageColor3 = Color3.new(0, 0, 0)
+shadow.ImageTransparency = 0.6
+shadow.ScaleType = Enum.ScaleType.Slice
+shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+shadow.Size = UDim2.new(1, 40, 1, 40)
+shadow.Position = UDim2.new(0, -20, 0, -20)
+shadow.ZIndex = 0
+shadow.Parent = mainFrame
+
+-- ===== Title Bar =====
+local titleBar = Instance.new("Frame")
+titleBar.Name = "TitleBar"
+titleBar.Size = UDim2.new(1, 0, 0, 56)
+titleBar.BackgroundColor3 = COLORS.TitleBar
+titleBar.BorderSizePixel = 0
+titleBar.Parent = mainFrame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 14)
+titleCorner.Parent = titleBar
+
+local titleMask = Instance.new("Frame")
+titleMask.BackgroundColor3 = COLORS.TitleBar
+titleMask.BorderSizePixel = 0
+titleMask.Size = UDim2.new(1, 0, 0, 16)
+titleMask.Position = UDim2.new(0, 0, 1, -16)
+titleMask.ZIndex = 0
+titleMask.Parent = titleBar
+
+local logo = Instance.new("ImageLabel")
+logo.Name = "Logo"
+logo.Size = UDim2.new(0, 32, 0, 32)
+logo.Position = UDim2.new(0, 16, 0.5, -16)
+logo.BackgroundTransparency = 1
+logo.Image = "rbxassetid://123892823865287"
+logo.Parent = titleBar
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "TitleLabel"
+titleLabel.Size = UDim2.new(1, -110, 1, 0)
+titleLabel.Position = UDim2.new(0, 60, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Project Den"
+titleLabel.TextColor3 = COLORS.Text
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextSize = 22
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = titleBar
+
+-- close button
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 32, 0, 32)
+closeButton.Position = UDim2.new(1, -46, 0.5, -16)
+closeButton.BackgroundColor3 = Color3.new(1, 1, 1)
+closeButton.BackgroundTransparency = 0.85
+closeButton.Text = "x"
+closeButton.TextColor3 = COLORS.Text
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 16
+closeButton.Parent = titleBar
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 8)
+closeCorner.Parent = closeButton
+
+closeButton.MouseButton1Click:Connect(function()
+	mainFrame.Visible = false
+end)
+
+closeButton.MouseEnter:Connect(function()
+	closeButton.BackgroundTransparency = 0.65
+end)
+
+closeButton.MouseLeave:Connect(function()
+	closeButton.BackgroundTransparency = 0.85
+end)
+
+-- ===== Sidebar =====
+local sidebar = Instance.new("Frame")
+sidebar.Name = "Sidebar"
+sidebar.Size = UDim2.new(0, 160, 1, -76)
+sidebar.Position = UDim2.new(0, 20, 0, 66)
+sidebar.BackgroundColor3 = Color3.fromRGB(25, 45, 120)
+sidebar.BorderSizePixel = 0
+sidebar.Parent = mainFrame
+
+local sidebarCorner = Instance.new("UICorner")
+sidebarCorner.CornerRadius = UDim.new(0, 10)
+sidebarCorner.Parent = sidebar
+
+local sidebarStroke = Instance.new("UIStroke")
+sidebarStroke.Color = COLORS.Stroke
+sidebarStroke.Thickness = 1
+sidebarStroke.Parent = sidebar
+
+local sidebarList = Instance.new("ScrollingFrame")
+sidebarList.Name = "SidebarList"
+sidebarList.Size = UDim2.new(1, -12, 1, -12)
+sidebarList.Position = UDim2.new(0, 6, 0, 6)
+sidebarList.BackgroundTransparency = 1
+sidebarList.BorderSizePixel = 0
+sidebarList.ScrollBarThickness = 4
+sidebarList.CanvasSize = UDim2.new(0, 0, 0, 0)
+sidebarList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+sidebarList.Parent = sidebar
+
+local sidebarListLayout = Instance.new("UIListLayout")
+sidebarListLayout.Padding = UDim.new(0, 6)
+sidebarListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+sidebarListLayout.Parent = sidebarList
+
+-- ===== Content Area =====
+local contentFrame = Instance.new("Frame")
+contentFrame.Name = "Content"
+contentFrame.Size = UDim2.new(1, -200, 1, -76)
+contentFrame.Position = UDim2.new(0, 200, 0, 66)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+-- ===== Forward Declaration for Scan System =====
+local runScan
+
+-- ===== Category System =====
+local categories = {}
+local activeCategory = nil
+
+local function selectCategory(name)
+	if activeCategory == name then
+		return
+	end
+
+	if activeCategory and categories[activeCategory] then
+		local prev = categories[activeCategory]
+		prev.button.BackgroundColor3 = Color3.fromRGB(25, 45, 120)
+		prev.button.BackgroundTransparency = 0
+		prev.page.Visible = false
+	end
+
+	local current = categories[name]
+
+	if current then
+		current.button.BackgroundColor3 = COLORS.Accent
+		current.button.BackgroundTransparency = 0
+		current.page.Visible = true
+		activeCategory = name
+
+		-- Automatically scan when Exploiter Detector is opened
+		if name == "Exploiter Detector" and runScan then
+			task.defer(function()
+				runScan()
+			end)
+		end
+	end
+end
+
+local function addCategory(name)
+	local button = Instance.new("TextButton")
+	button.Name = name .. "Button"
+	button.Size = UDim2.new(1, 0, 0, 34)
+	button.BackgroundColor3 = Color3.fromRGB(25, 45, 120)
+	button.AutoButtonColor = false
+	button.Text = name
+	button.TextColor3 = COLORS.Text
+	button.Font = Enum.Font.GothamMedium
+	button.TextSize = 14
+	button.Parent = sidebarList
+
+	local buttonCorner = Instance.new("UICorner")
+	buttonCorner.CornerRadius = UDim.new(0, 6)
+	buttonCorner.Parent = button
+
+	button.MouseButton1Click:Connect(function()
+		selectCategory(name)
+	end)
+
+	local page = Instance.new("Frame")
+	page.Name = name .. "Page"
+	page.Size = UDim2.new(1, 0, 1, 0)
+	page.BackgroundTransparency = 1
+	page.Visible = false
+	page.Parent = contentFrame
+
+	categories[name] = {
+		button = button,
+		page = page
+	}
+
+	return page
+end
+
+-- Create Main category
+local mainPage = addCategory("Main")
+selectCategory("Main")
+
+-- ===== Main Controls Configuration =====
+local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local humanoid
+local rootPart
+
+local function updateCharacter()
+	character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+	humanoid = character:WaitForChild("Humanoid")
+	rootPart = character:WaitForChild("HumanoidRootPart")
+end
+
+updateCharacter()
+
+localPlayer.CharacterAdded:Connect(function()
+	task.wait(0.5)
+	updateCharacter()
+end)
+
+-- ===== WalkSpeed UI =====
+local walkSpeedValue = 16
+
+local walkSpeedLabel = Instance.new("TextLabel")
+walkSpeedLabel.Size = UDim2.new(1, 0, 0, 30)
+walkSpeedLabel.Position = UDim2.new(0, 0, 0, 0)
+walkSpeedLabel.BackgroundTransparency = 1
+walkSpeedLabel.Text = "WalkSpeed: 16"
+walkSpeedLabel.TextColor3 = COLORS.BodyText
+walkSpeedLabel.Font = Enum.Font.GothamBold
+walkSpeedLabel.TextSize = 16
+walkSpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
+walkSpeedLabel.Parent = mainPage
+
+local walkSpeedSlider = Instance.new("TextButton")
+walkSpeedSlider.Size = UDim2.new(1, 0, 0, 10)
+walkSpeedSlider.Position = UDim2.new(0, 0, 0, 38)
+walkSpeedSlider.BackgroundColor3 = COLORS.Stroke
+walkSpeedSlider.BorderSizePixel = 0
+walkSpeedSlider.Text = ""
+walkSpeedSlider.AutoButtonColor = false
+walkSpeedSlider.Parent = mainPage
+
+local walkSpeedFill = Instance.new("Frame")
+walkSpeedFill.Size = UDim2.new(0, 0, 1, 0)
+walkSpeedFill.BackgroundColor3 = COLORS.Accent
+walkSpeedFill.BorderSizePixel = 0
+walkSpeedFill.Parent = walkSpeedSlider
+
+local walkSpeedKnob = Instance.new("Frame")
+walkSpeedKnob.Size = UDim2.new(0, 14, 0, 14)
+walkSpeedKnob.AnchorPoint = Vector2.new(0.5, 0.5)
+walkSpeedKnob.Position = UDim2.new(0, 0, 0.5, 0)
+walkSpeedKnob.BackgroundColor3 = COLORS.Text
+walkSpeedKnob.BorderSizePixel = 0
+walkSpeedKnob.Parent = walkSpeedSlider
+
+local walkKnobCorner = Instance.new("UICorner")
+walkKnobCorner.CornerRadius = UDim.new(1, 0)
+walkKnobCorner.Parent = walkSpeedKnob
+
+local function setWalkSpeed(value)
+	walkSpeedValue = math.clamp(math.floor(value + 0.5), 16, 100)
+	walkSpeedLabel.Text = "WalkSpeed: " .. walkSpeedValue
+	local percent = (walkSpeedValue - 16) / (100 - 16)
+	walkSpeedFill.Size = UDim2.new(percent, 0, 1, 0)
+	walkSpeedKnob.Position = UDim2.new(percent, 0, 0.5, 0)
+	if humanoid then
+		humanoid.WalkSpeed = walkSpeedValue
+	end
+end
+
+local walkDragging = false
+walkSpeedSlider.MouseButton1Down:Connect(function(x)
+	walkDragging = true
+	local percent = math.clamp((x - walkSpeedSlider.AbsolutePosition.X) / walkSpeedSlider.AbsoluteSize.X, 0, 1)
+	setWalkSpeed(16 + percent * (100 - 16))
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if walkDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+Use code with caution.local percent = math.clamp((input.Position.X - walkSpeedSlider.AbsolutePosition.X) / walkSpeedSlider.AbsoluteSize.X, 0, 1)setWalkSpeed(16 + percent * (100 - 16))endend)UserInputService.InputEnded:Connect(function(input)if input.UserInputType == Enum.UserInputType.MouseButton1 thenwalkDragging = falseendend)setWalkSpeed(16)-- ===== Fly Feature UI =====local flying = falselocal flySpeed = 50local flyConnectionlocal flyVelocitylocal flyGyrolocal flyButton = Instance.new("TextButton")flyButton.Size = UDim2.new(1, 0, 0, 38)flyButton.Position = UDim2.new(0, 0, 0, 65)flyButton.BackgroundColor3 = COLORS.AccentflyButton.BorderSizePixel = 0flyButton.Text = "Fly: OFF"flyButton.TextColor3 = COLORS.TextflyButton.Font = Enum.Font.GothamBoldflyButton.TextSize = 14flyButton.Parent = mainPagelocal flyCorner = Instance.new("UICorner")flyCorner.CornerRadius = UDim.new(0, 8)flyCorner.Parent = flyButton-- ===== Fly Speed Slider =====local flySpeedLabel = Instance.new("TextLabel")flySpeedLabel.Size = UDim2.new(1, 0, 0, 30)flySpeedLabel.Position = UDim2.new(0, 0, 0, 113)flySpeedLabel.BackgroundTransparency = 1flySpeedLabel.Text = "Fly Speed: 50"flySpeedLabel.TextColor3 = COLORS.BodyTextflySpeedLabel.Font = Enum.Font.GothamBoldflySpeedLabel.TextSize = 16flySpeedLabel.TextXAlignment = Enum.TextXAlignment.LeftflySpeedLabel.Parent = mainPagelocal flySpeedSlider = Instance.new("TextButton")flySpeedSlider.Size = UDim2.new(1, 0, 0, 10)flySpeedSlider.Position = UDim2.new(0, 0, 0, 151)flySpeedSlider.BackgroundColor3 = COLORS.StrokeflySpeedSlider.BorderSizePixel = 0flySpeedSlider.Text = ""flySpeedSlider.AutoButtonColor = falseflySpeedSlider.Parent = mainPagelocal flySpeedFill = Instance.new("Frame")flySpeedFill.Size = UDim2.new(0, 0, 1, 0)flySpeedFill.BackgroundColor3 = COLORS.AccentflySpeedFill.BorderSizePixel = 0flySpeedFill.Parent = flySpeedSliderlocal flySpeedKnob = Instance.new("Frame")flySpeedKnob.Size = UDim2.new(0, 14, 0, 14)flySpeedKnob.AnchorPoint = Vector2.new(0.5, 0.5)flySpeedKnob.BackgroundColor3 = COLORS.TextflySpeedKnob.BorderSizePixel = 0flySpeedKnob.Parent = flySpeedSliderlocal flyKnobCorner = Instance.new("UICorner")flyKnobCorner.CornerRadius = UDim.new(1, 0)flyKnobCorner.Parent = flySpeedKnoblocal function setFlySpeed(value)flySpeed = math.clamp(math.floor(value + 0.5), 10, 150)flySpeedLabel.Text = "Fly Speed: " .. flySpeedlocal percent = (flySpeed - 10) / (150 - 10)flySpeedFill.Size = UDim2.new(percent, 0, 1, 0)flySpeedKnob.Position = UDim2.new(percent, 0, 0.5, 0)endlocal flyDragging = falseflySpeedSlider.MouseButton1Down:Connect(function(x)flyDragging = truelocal percent = math.clamp((x - flySpeedSlider.AbsolutePosition.X) / flySpeedSlider.AbsoluteSize.X, 0, 1)setFlySpeed(10 + percent * (150 - 10))end)UserInputService.InputChanged:Connect(function(input)if flyDragging and input.UserInputType == Enum.UserInputType.MouseMovement thenlocal percent = math.clamp((input.Position.X - flySpeedSlider.AbsolutePosition.X) / flySpeedSlider.AbsoluteSize.X, 0, 1)setFlySpeed(10 + percent * (150 - 10))endend)UserInputService.InputEnded:Connect(function(input)if input.UserInputType == Enum.UserInputType.MouseButton1 thenflyDragging = falseendend)setFlySpeed(50)local function stopFlying()flying = falseflyButton.Text = "Fly: OFF"flyButton.BackgroundColor3 = COLORS.Accentif flyConnection thenflyConnection:Disconnect()flyConnection = nilendif flyVelocity thenflyVelocity:Destroy()flyVelocity = nilendif flyGyro thenflyGyro:Destroy()flyGyro = nilendendlocal function startFlying()if not character or not rootPart thenupdateCharacter()endflying = trueflyButton.Text = "Fly: ON"flyButton.BackgroundColor3 = COLORS.AccentDimflyVelocity = Instance.new("BodyVelocity")flyVelocity.MaxForce = Vector3.new(1e6, 1e6, 1e6)flyVelocity.Velocity = Vector3.zeroflyVelocity.Parent = rootPartflyGyro = Instance.new("BodyGyro")flyGyro.MaxTorque = Vector3.new(1e6, 1e6, 1e6)flyGyro.P = 10000flyGyro.Parent = rootPartflyConnection = RunService.RenderStepped:Connect(function()if not flying or not rootPart thenreturnendlocal camera = workspace.CurrentCameralocal direction = Vector3.zeroif UserInputService:IsKeyDown(Enum.KeyCode.W) then direction += camera.CFrame.LookVector endif UserInputService:IsKeyDown(Enum.KeyCode.S) then direction -= camera.CFrame.LookVector endif UserInputService:IsKeyDown(Enum.KeyCode.A) then direction -= camera.CFrame.RightVector endif UserInputService:IsKeyDown(Enum.KeyCode.D) then direction += camera.CFrame.RightVector endif UserInputService:IsKeyDown(Enum.KeyCode.Space) then direction += Vector3.yAxis endif UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then direction -= Vector3.yAxis endif direction.Magnitude > 0 thendirection = direction.UnitendflyVelocity.Velocity = direction * flySpeedflyGyro.CFrame = camera.CFrameend)endflyButton.MouseButton1Click:Connect(function()if flying thenstopFlying()elsestartFlying()endend)-- ===== Noclip UI Setup =====local ProjectDenNoclip = falselocal ProjectDenNoclipConnectionlocal function setNoclip(enabled)ProjectDenNoclip = enabledif enabled thenif ProjectDenNoclipConnection thenProjectDenNoclipConnection:Disconnect()endProjectDenNoclipConnection = RunService.Stepped:Connect(function()local character = localPlayer.Characterif not character thenreturnendfor _, part in ipairs(character:GetDescendants()) doif part:IsA("BasePart") thenpart.CanCollide = falseendendend)elseif ProjectDenNoclipConnection thenProjectDenNoclipConnection:Disconnect()ProjectDenNoclipConnection = nilendlocal character = localPlayer.Characterif character thenfor _, part in ipairs(character:GetDescendants()) doif part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" thenpart.CanCollide = trueendendendendendlocal noclipButton = Instance.new("TextButton")noclipButton.Name = "NoclipButton"noclipButton.Size = UDim2.new(1, 0, 0, 38)-- Position shifted below fly items to avoid graphical layout layering bugsnoclipButton.Position = UDim2.new(0, 0, 0, 180)noclipButton.BackgroundColor3 = COLORS.AccentnoclipButton.BorderSizePixel = 0noclipButton.Text = "Noclip: OFF"noclipButton.TextColor3 = COLORS.TextnoclipButton.Font = Enum.Font.GothamBoldnoclipButton.TextSize = 14noclipButton.AutoButtonColor = falsenoclipButton.Parent = mainPagelocal noclipCorner = Instance.new("UICorner")noclipCorner.CornerRadius = UDim.new(0, 8)noclipCorner.Parent = noclipButtonnoclipButton.MouseButton1Click:Connect(function()ProjectDenNoclip = not ProjectDenNoclipsetNoclip(ProjectDenNoclip)noclipButton.Text = ProjectDenNoclip and "Noclip: ON" or "Noclip: OFF"noclipButton.BackgroundColor3 = ProjectDenNoclipand COLORS.AccentDimor COLORS.Accentend)-- ===== Exploiter Detector Page =====local detectorPage = addCategory("Exploiter Detector")local detectorHeader = Instance.new("TextLabel")detectorHeader.Name = "DetectorHeader"detectorHeader.Size = UDim2.new(1, 0, 0, 28)detectorHeader.BackgroundTransparency = 1detectorHeader.Text = "Flagged Players"detectorHeader.TextColor3 = COLORS.BodyTextdetectorHeader.Font = Enum.Font.GothamBolddetectorHeader.TextSize = 18detectorHeader.TextXAlignment = Enum.TextXAlignment.LeftdetectorHeader.Parent = detectorPagelocal detectorSub = Instance.new("TextLabel")detectorSub.Name = "DetectorSub"detectorSub.Size = UDim2.new(1, 0, 0, 20)detectorSub.Position = UDim2.new(0, 0, 0, 28)detectorSub.BackgroundTransparency = 1detectorSub.Text = "Heuristic flags reported by the server. Not 100% accurate — review before acting."detectorSub.TextColor3 = COLORS.SubTextdetectorSub.Font = Enum.Font.GothamdetectorSub.TextSize = 12detectorSub.TextXAlignment = Enum.TextXAlignment.LeftdetectorSub.TextWrapped = truedetectorSub.Parent = detectorPage-- Player status listlocal statusList = Instance.new("ScrollingFrame")statusList.Name = "StatusList"statusList.Size = UDim2.new(1, 0, 0, 150)statusList.Position = UDim2.new(0, 0, 0, 56)statusList.BackgroundTransparency = 1statusList.BorderSizePixel = 0statusList.ScrollBarThickness = 4statusList.CanvasSize = UDim2.new(0, 0, 0, 0)statusList.AutomaticCanvasSize = Enum.AutomaticSize.YstatusList.Parent = detectorPagelocal statusListLayout = Instance.new("UIListLayout")statusListLayout.Padding = UDim.new(0, 4)statusListLayout.SortOrder = Enum.SortOrder.LayoutOrderstatusListLayout.Parent = statusListlocal statusEmptyLabel = Instance.new("TextLabel")statusEmptyLabel.Name = "StatusEmptyLabel"statusEmptyLabel.Size = UDim2.new(1, 0, 0, 26)statusEmptyLabel.BackgroundTransparency = 1statusEmptyLabel.Text = "Scanning players..."statusEmptyLabel.TextColor3 = COLORS.SubTextstatusEmptyLabel.Font = Enum.Font.GothamstatusEmptyLabel.TextSize = 13statusEmptyLabel.TextXAlignment = Enum.TextXAlignment.LeftstatusEmptyLabel.LayoutOrder = 0statusEmptyLabel.Parent = statusListlocal function clearStatusList()for , child in ipairs(statusList:GetChildren()) doif child:IsA("Frame") and child.Name:match("^StatusRow") thenchild:Destroy()endendendlocal function addStatusRow(index, playerName, isFlagged)local row = Instance.new("Frame")row.Name = "StatusRow_" .. indexrow.Size = UDim2.new(1, 0, 0, 26)row.BackgroundTransparency = 1row.LayoutOrder = indexrow.Parent = statusListlocal dot = Instance.new("Frame")dot.Name = "Dot"dot.Size = UDim2.new(0, 10, 0, 10)dot.Position = UDim2.new(0, 4, 0.5, -5)dot.BackgroundColor3 = isFlaggedand Color3.fromRGB(230, 80, 80)or Color3.fromRGB(80, 220, 120)dot.BorderSizePixel = 0dot.Parent = rowlocal dotCorner = Instance.new("UICorner")dotCorner.CornerRadius = UDim.new(1, 0)dotCorner.Parent = dotlocal nameLabel = Instance.new("TextLabel")nameLabel.Size = UDim2.new(0.6, -24, 1, 0)nameLabel.Position = UDim2.new(0, 22, 0, 0)nameLabel.BackgroundTransparency = 1nameLabel.Text = playerNamenameLabel.TextColor3 = COLORS.BodyTextnameLabel.Font = Enum.Font.GothamMediumnameLabel.TextSize = 13nameLabel.TextXAlignment = Enum.TextXAlignment.LeftnameLabel.Parent = rowlocal statusLabel = Instance.new("TextLabel")statusLabel.Size = UDim2.new(0.4, -6, 1, 0)statusLabel.Position = UDim2.new(0.6, 0, 0, 0)statusLabel.BackgroundTransparency = 1statusLabel.Text = isFlagged and "Exploiter" or "Normal"statusLabel.TextColor3 = isFlaggedand Color3.fromRGB(230, 80, 80)or Color3.fromRGB(80, 220, 120)statusLabel.Font = Enum.Font.GothamBoldstatusLabel.TextSize = 13statusLabel.TextXAlignment = Enum.TextXAlignment.RightstatusLabel.Parent = rowreturn rowend-- ===== Automatic Player Scan Functional Implementation =====local eventsFolder = ReplicatedStorage:FindFirstChild("ProjectDenEvents")runScan = function()if not eventsFolder thenstatusEmptyLabel.Visible = truestatusEmptyLabel.Text = "Detector server script not found."returnendlocal statusFunction = eventsFolder:FindFirstChild("GetPlayerStatuses")if not statusFunction thenstatusEmptyLabel.Visible = truestatusEmptyLabel.Text = "Detector server script not found."returnendstatusEmptyLabel.Visible = truestatusEmptyLabel.Text = "Scanning players..."local ok, result = pcall(function()return statusFunction:InvokeServer()end)clearStatusList()if not ok or type(result) ~= "table" or #result == 0 thenstatusEmptyLabel.Visible = truestatusEmptyLabel.Text = "No players found."returnendstatusEmptyLabel.Visible = falsefor i, entry in ipairs(result) doaddStatusRow(i,tostring(entry.Name),entry.Flagged == true)endend-- ===== Flag Log UI =====local detectorList = Instance.new("ScrollingFrame")detectorList.Name = "DetectorList"detectorList.Size = UDim2.new(1, 0, 1, -216)detectorList.Position = UDim2.new(0, 0, 0, 216)detectorList.BackgroundTransparency = 1detectorList.BorderSizePixel = 0detectorList.ScrollBarThickness = 4detectorList.CanvasSize = UDim2.new(0, 0, 0, 0)detectorList.AutomaticCanvasSize = Enum.AutomaticSize.YdetectorList.Parent = detectorPagelocal detectorListLayout = Instance.new("UIListLayout")detectorListLayout.Padding = UDim.new(0, 6)detectorListLayout.SortOrder = Enum.SortOrder.LayoutOrderdetectorListLayout.Parent = detectorListlocal detectorEmptyLabel = Instance.new("TextLabel")detectorEmptyLabel.Name = "EmptyLabel"detectorEmptyLabel.Size = UDim2.new(1, 0, 0, 30)detectorEmptyLabel.BackgroundTransparency = 1detectorEmptyLabel.Text = "No flags yet."detectorEmptyLabel.TextColor3 = COLORS.SubTextdetectorEmptyLabel.Font = Enum.Font.GothamdetectorEmptyLabel.TextSize = 13detectorEmptyLabel.TextXAlignment = Enum.TextXAlignment.LeftdetectorEmptyLabel.LayoutOrder = 0detectorEmptyLabel.Parent = detectorListlocal flagCount = 0local function addFlagEntry(playerName, reason)flagCount += 1detectorEmptyLabel.Visible = falselocal entry = Instance.new("Frame")entry.Name = "Flag_" .. flagCountentry.Size = UDim2.new(1, 0, 0, 48)entry.BackgroundColor3 = COLORS.WarningBgentry.BorderSizePixel = 0entry.LayoutOrder = flagCountentry.Parent = detectorListlocal entryCorner = Instance.new("UICorner")entryCorner.CornerRadius = UDim.new(0, 8)entryCorner.Parent = entrylocal entryStroke = Instance.new("UIStroke")entryStroke.Color = COLORS.WarningentryStroke.Thickness = 1entryStroke.Transparency = 0.5entryStroke.Parent = entrylocal nameLabel = Instance.new("TextLabel")nameLabel.Size = UDim2.new(1, -16, 0, 20)nameLabel.Position = UDim2.new(0, 10, 0, 4)nameLabel.BackgroundTransparency = 1nameLabel.Text = playerNamenameLabel.TextColor3 = COLORS.WarningnameLabel.Font = Enum.Font.GothamBoldnameLabel.TextSize = 14nameLabel.TextXAlignment = Enum.TextXAlignment.LeftnameLabel.Parent = entrylocal reasonLabel = Instance.new("TextLabel")reasonLabel.Size = UDim2.new(1, -16, 0, 18)reasonLabel.Position = UDim2.new(0, 10, 0, 24)reasonLabel.BackgroundTransparency = 1reasonLabel.Text = reason .. "  •  " .. os.date("%H:%M:%S")reasonLabel.TextColor3 = COLORS.SubTextreasonLabel.Font = Enum.Font.GothamreasonLabel.TextSize = 12reasonLabel.TextXAlignment = Enum.TextXAlignment.LeftreasonLabel.Parent = entryreturn entryend-- Listen for server-reported flagsif eventsFolder thenlocal flagEvent = eventsFolder:FindFirstChild("ExploiterFlagged")if flagEvent thenflagEvent.OnClientEvent:Connect(function(playerName, reason)addFlagEntry(tostring(playerName), tostring(reason))end)endend-- ===== Frame Drag Functionality =====local dragging = falselocal dragStart, startPostitleBar.InputBegan:Connect(function(input)if input.UserInputType == Enum.UserInputType.MouseButton1or input.UserInputType == Enum.UserInputType.Touch thendragging = truedragStart = input.PositionstartPos = mainFrame.Positioninput.Changed:Connect(function()if input.UserInputState == Enum.UserInputState.End thendragging = falseendend)endend)UserInputService.InputChanged:Connect(function(input)if dragging and (input.UserInputType == Enum.UserInputType.MouseMovementor input.UserInputType == Enum.UserInputType.Touch) thenlocal delta = input.Position - dragStartmainFrame.Position = UDim2.new(startPos.X.Scale,startPos.X.Offset + delta.X,startPos.Y.Scale,startPos.Y.Offset + delta.Y)endend)
