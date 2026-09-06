@@ -1,3 +1,4 @@
+```
 -- StarterGui/ProjectDenGUI.lua (LocalScript)
 
 local Players = game:GetService("Players")
@@ -2002,6 +2003,252 @@ task.spawn(function()
 	end
 end)
 
+
+-- ===== Fling Page =====
+local flingPage = addCategory("Fling")
+
+local flingHeader = Instance.new("TextLabel")
+flingHeader.Name = "FlingHeader"
+flingHeader.Size = UDim2.new(1, 0, 0, 28)
+flingHeader.BackgroundTransparency = 1
+flingHeader.Text = "Fling"
+flingHeader.TextColor3 = COLORS.BodyText
+flingHeader.Font = Enum.Font.GothamBold
+flingHeader.TextSize = 18
+flingHeader.TextXAlignment = Enum.TextXAlignment.Left
+flingHeader.Parent = flingPage
+
+local flingSub = Instance.new("TextLabel")
+flingSub.Name = "FlingSub"
+flingSub.Size = UDim2.new(1, 0, 0, 36)
+flingSub.Position = UDim2.new(0, 0, 0, 28)
+flingSub.BackgroundTransparency = 1
+flingSub.Text = "Select a player, then press Fling. Physics/network ownership can affect whether it works in a particular game."
+flingSub.TextColor3 = COLORS.SubText
+flingSub.Font = Enum.Font.Gotham
+flingSub.TextSize = 12
+flingSub.TextXAlignment = Enum.TextXAlignment.Left
+flingSub.TextYAlignment = Enum.TextYAlignment.Top
+flingSub.TextWrapped = true
+flingSub.Parent = flingPage
+
+local flingTarget = nil
+
+local flingTargetLabel = Instance.new("TextLabel")
+flingTargetLabel.Name = "FlingTargetLabel"
+flingTargetLabel.Size = UDim2.new(1, 0, 0, 26)
+flingTargetLabel.Position = UDim2.new(0, 0, 0, 68)
+flingTargetLabel.BackgroundTransparency = 1
+flingTargetLabel.Text = "Target: None"
+flingTargetLabel.TextColor3 = COLORS.BodyText
+flingTargetLabel.Font = Enum.Font.GothamBold
+flingTargetLabel.TextSize = 14
+flingTargetLabel.TextXAlignment = Enum.TextXAlignment.Left
+flingTargetLabel.Parent = flingPage
+
+local flingButton = Instance.new("TextButton")
+flingButton.Name = "FlingButton"
+flingButton.Size = UDim2.new(1, 0, 0, 38)
+flingButton.Position = UDim2.new(0, 0, 0, 96)
+flingButton.BackgroundColor3 = COLORS.Accent
+flingButton.BorderSizePixel = 0
+flingButton.Text = "Fling Selected"
+flingButton.TextColor3 = COLORS.Text
+flingButton.Font = Enum.Font.GothamBold
+flingButton.TextSize = 14
+flingButton.AutoButtonColor = false
+flingButton.Parent = flingPage
+
+local flingCorner = Instance.new("UICorner")
+flingCorner.CornerRadius = UDim.new(0, 8)
+flingCorner.Parent = flingButton
+
+local flingList = Instance.new("ScrollingFrame")
+flingList.Name = "FlingPlayerList"
+flingList.Size = UDim2.new(1, 0, 1, -144)
+flingList.Position = UDim2.new(0, 0, 0, 144)
+flingList.BackgroundTransparency = 1
+flingList.BorderSizePixel = 0
+flingList.ScrollBarThickness = 4
+flingList.CanvasSize = UDim2.new(0, 0, 0, 0)
+flingList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+flingList.Parent = flingPage
+
+local flingListLayout = Instance.new("UIListLayout")
+flingListLayout.Padding = UDim.new(0, 6)
+flingListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+flingListLayout.Parent = flingList
+
+local function clearFlingList()
+	for _, child in ipairs(flingList:GetChildren()) do
+		if child:IsA("TextButton") then
+			child:Destroy()
+		end
+	end
+end
+
+local function flingPlayer(targetPlayer)
+	if not targetPlayer or not targetPlayer.Parent then
+		return false, "Target left the server."
+	end
+
+	local targetCharacter = targetPlayer.Character
+	local targetRoot = targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart")
+	if not targetRoot then
+		return false, "Target has no HumanoidRootPart."
+	end
+
+	if not rootPart or not rootPart.Parent then
+		updateCharacter()
+	end
+
+	if not rootPart then
+		return false, "Your character is unavailable."
+	end
+
+	-- Short physics burst toward the selected player.
+	-- This is intentionally client-side; the game decides whether the
+	-- character is network-owned enough for the interaction to replicate.
+	local oldAutoRotate = humanoid and humanoid.AutoRotate
+	if humanoid then
+		humanoid.AutoRotate = false
+	end
+
+	local direction = targetRoot.Position - rootPart.Position
+	if direction.Magnitude < 1 then
+		direction = targetRoot.CFrame.LookVector
+	else
+		direction = direction.Unit
+	end
+
+	local burst = direction * 220 + Vector3.new(0, 55, 0)
+	rootPart.AssemblyLinearVelocity = burst
+
+	task.delay(0.35, function()
+		if rootPart and rootPart.Parent then
+			rootPart.AssemblyLinearVelocity = Vector3.zero
+		end
+		if humanoid and humanoid.Parent and oldAutoRotate ~= nil then
+			humanoid.AutoRotate = oldAutoRotate
+		end
+	end)
+
+	return true
+end
+
+local function refreshFlingList()
+	clearFlingList()
+
+	local others = {}
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= localPlayer then
+			table.insert(others, player)
+		end
+	end
+
+	table.sort(others, function(a, b)
+		return a.Name:lower() < b.Name:lower()
+	end)
+
+	for index, player in ipairs(others) do
+		local button = Instance.new("TextButton")
+		button.Name = "FlingTarget_" .. player.UserId
+		button.Size = UDim2.new(1, 0, 0, 34)
+		button.BackgroundColor3 = (flingTarget == player) and COLORS.AccentDim or Color3.fromRGB(25, 45, 120)
+		button.BorderSizePixel = 0
+		button.Text = player.DisplayName .. "  @" .. player.Name
+		button.TextColor3 = COLORS.BodyText
+		button.Font = Enum.Font.GothamMedium
+		button.TextSize = 13
+		button.AutoButtonColor = false
+		button.LayoutOrder = index
+		button.Parent = flingList
+
+		local corner = Instance.new("UICorner")
+		corner.CornerRadius = UDim.new(0, 6)
+		corner.Parent = button
+
+		button.MouseButton1Click:Connect(function()
+			if not player.Parent then
+				flingTarget = nil
+				flingTargetLabel.Text = "Target: None"
+				refreshFlingList()
+				return
+			end
+
+			flingTarget = player
+			flingTargetLabel.Text = "Target: " .. player.DisplayName .. " (@" .. player.Name .. ")"
+			refreshFlingList()
+		end)
+	end
+
+	if #others == 0 then
+		local empty = Instance.new("TextLabel")
+		empty.Name = "FlingEmpty"
+		empty.Size = UDim2.new(1, 0, 0, 30)
+		empty.BackgroundTransparency = 1
+		empty.Text = "No other players in this server."
+		empty.TextColor3 = COLORS.SubText
+		empty.Font = Enum.Font.Gotham
+		empty.TextSize = 13
+		empty.TextXAlignment = Enum.TextXAlignment.Left
+		empty.Parent = flingList
+	end
+end
+
+flingButton.MouseButton1Click:Connect(function()
+	if not flingTarget then
+		flingTargetLabel.Text = "Target: None — select a player first."
+		return
+	end
+
+	local success, message = flingPlayer(flingTarget)
+	if success then
+		flingButton.Text = "Flinging " .. flingTarget.DisplayName .. "..."
+		flingButton.BackgroundColor3 = COLORS.AccentDim
+
+		task.delay(0.5, function()
+			if flingButton and flingButton.Parent then
+				flingButton.Text = "Fling Selected"
+				flingButton.BackgroundColor3 = COLORS.Accent
+			end
+		end)
+	else
+		flingTargetLabel.Text = "Target: " .. tostring(message)
+	end
+end)
+
+flingButton.MouseEnter:Connect(function()
+	if flingButton.Text == "Fling Selected" then
+		flingButton.BackgroundColor3 = COLORS.AccentDim
+	end
+end)
+
+flingButton.MouseLeave:Connect(function()
+	if flingButton.Text == "Fling Selected" then
+		flingButton.BackgroundColor3 = COLORS.Accent
+	end
+end)
+
+Players.PlayerAdded:Connect(function()
+	if activeCategory == "Fling" then
+		refreshFlingList()
+	end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	if flingTarget == player then
+		flingTarget = nil
+		flingTargetLabel.Text = "Target: None"
+	end
+
+	if activeCategory == "Fling" then
+		refreshFlingList()
+	end
+end)
+
+refreshFlingList()
+
 -- ===== Nametags =====
 -- Owner UserId: 8271158353
 -- Only the owner gets a tag — everyone else is left alone.
@@ -2082,3 +2329,4 @@ for _, player in ipairs(Players:GetPlayers()) do
 end
 
 Players.PlayerAdded:Connect(setupProjectDenNametag)
+```
